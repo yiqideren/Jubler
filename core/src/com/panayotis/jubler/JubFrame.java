@@ -369,6 +369,7 @@ public class JubFrame extends JFrame implements WindowFocusListener {
         NewTB = new javax.swing.JButton();
         LoadTB = new javax.swing.JButton();
         SaveTB = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
         InfoTB = new javax.swing.JButton();
         EditTP = new javax.swing.JPanel();
         CutTB = new javax.swing.JButton();
@@ -601,18 +602,23 @@ public class JubFrame extends JFrame implements WindowFocusListener {
         SaveTB.setIcon(Theme.loadIcon("save.png"));
         SaveTB.setToolTipText(_("Save"));
         SaveTB.setEnabled(false);
-        SystemDependent.setToolBarButtonStyle(SaveTB, "middle");
+        SystemDependent.setToolBarButtonStyle(SaveTB, "last");
         SaveTB.addActionListener(formListener);
         FileTP.add(SaveTB);
+
+        JublerTools.add(FileTP);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 8, 0, 0));
+        jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
 
         InfoTB.setIcon(Theme.loadIcon("info.png"));
         InfoTB.setToolTipText(_("Project Information"));
         InfoTB.setEnabled(false);
-        SystemDependent.setToolBarButtonStyle(InfoTB, "last");
+        SystemDependent.setToolBarButtonStyle(InfoTB, "only");
         InfoTB.addActionListener(formListener);
-        FileTP.add(InfoTB);
+        jPanel1.add(InfoTB);
 
-        JublerTools.add(FileTP);
+        JublerTools.add(jPanel1);
 
         EditTP.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 8, 0, 8));
         EditTP.setLayout(new javax.swing.BoxLayout(EditTP, javax.swing.BoxLayout.LINE_AXIS));
@@ -1170,9 +1176,6 @@ public class JubFrame extends JFrame implements WindowFocusListener {
             else if (evt.getSource() == PasteSpecialEM) {
                 JubFrame.this.PasteSpecialEMActionPerformed(evt);
             }
-            else if (evt.getSource() == ToolsLockM) {
-                JubFrame.this.ToolsLockMActionPerformed(evt);
-            }
             else if (evt.getSource() == EmptyLinesDEM) {
                 JubFrame.this.EmptyLinesDEMActionPerformed(evt);
             }
@@ -1226,6 +1229,9 @@ public class JubFrame extends JFrame implements WindowFocusListener {
             }
             else if (evt.getSource() == RedoEM) {
                 JubFrame.this.RedoEMActionPerformed(evt);
+            }
+            else if (evt.getSource() == ToolsLockM) {
+                JubFrame.this.ToolsLockMActionPerformed(evt);
             }
             else if (evt.getSource() == BeginningTTM) {
                 JubFrame.this.BeginningTTMActionPerformed(evt);
@@ -1827,6 +1833,7 @@ private void ToolsLockMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     private javax.swing.JMenuItem YellowMEM;
     private javax.swing.JMenuItem YellowMP;
     private javax.swing.JMenuItem byTimeGEM;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator10;
     private javax.swing.JSeparator jSeparator11;
