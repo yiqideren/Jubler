@@ -22,10 +22,10 @@
  */
 package com.panayotis.jubler.os;
 
+import com.panayotis.jubler.subs.Share;
 import com.panayotis.jubler.tools.externals.ExtPath;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -87,6 +87,8 @@ public class TreeWalker {
             return exec.isFile();
 
         Process proc = null;
+        boolean valid = false;
+        
         String[] cmd = new String[parameters.length + 1];
         cmd[0] = exec.getAbsolutePath();
         if (parameters.length > 0)
@@ -99,21 +101,26 @@ public class TreeWalker {
                 buf.append(cmd[i]).append(' ');
             DEBUG.debug(buf.toString());
             proc = Runtime.getRuntime().exec(cmd);
-            BufferedReader infopipe = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-            String line;
-            while ((line = infopipe.readLine()) != null)
-                if (line.toLowerCase().contains(test_signature)) {
-                    DEBUG.debug("Valid executable found: " + exec.getAbsolutePath());
-                    proc.destroy();
-                    return true;
-                }
+            InputStream inp = proc.getInputStream();
+            InputStream erp = proc.getErrorStream();
+
+            RuntimeProcessStreamReader ins = new RuntimeProcessStreamReader("stdin", inp);
+            RuntimeProcessStreamReader ers = new RuntimeProcessStreamReader("stderr", erp);
+            ins.start();
+            ers.start();
+            proc.waitFor();
+            boolean found_ins = (!Share.isEmpty(test_signature)) && 
+                                ins.containsIgnoreCase(test_signature);
+            boolean found_ers = (!Share.isEmpty(test_signature)) && 
+                                ers.containsIgnoreCase(test_signature);
+            valid = (found_ins || found_ers);
         } catch (Exception ex) {
         } finally {
             try {
                 proc.destroy();
             } catch (Exception e) {
             }
-        }
-        return false;
+        }            
+        return valid;
     }
 }
