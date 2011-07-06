@@ -44,38 +44,47 @@ public class TreeWalker {
         for (ExtPath path : paths) {
             DEBUG.debug("Wizard is looking inside " + path.getPath());
             File f = new File(path.getPath());
-            if (path.searchForFile() && (!f.isFile()))
+            if (path.searchForFile() && (!f.isFile())) {
                 continue;   // If we want a file and this is not, ignore this entry
+            }
             File res = searchExecutable(f, application, parameters, test_signature, path.getRecStatus());
-            if (res != null)
+            if (res != null) {
                 return res;
+            }
         }
         return null;
     }
 
     /* filename is already in lower case... */
     public static File searchExecutable(File root, ArrayList<String> program, String[] parameters, String test_signature, int recursive) {
-        if (!root.exists())
+        if (!root.exists()) {
             return null;
+        }
         if (root.isFile()) {
-            if (!root.canRead())
+            if (!root.canRead()) {
                 return null;
-            for (String progname : program)
-                if (root.getName().toLowerCase().equals(progname) && execIsValid(root, parameters, test_signature))
+            }
+            for (String progname : program) {
+                if (root.getName().toLowerCase().equals(progname) && execIsValid(root, parameters, test_signature)) {
                     return root;
+                }
+            }
             /* No valid executable found */
             return null;
         } else {
-            if (recursive <= ExtPath.FILE_ONLY)
+            if (recursive <= ExtPath.FILE_ONLY) {
                 return null;   // No more recursive should be done
+            }
             recursive--;
             File[] childs = root.listFiles();
-            if (childs != null)
+            if (childs != null) {
                 for (int i = 0; i < childs.length; i++) {
                     File res = searchExecutable(childs[i], program, parameters, test_signature, recursive);
-                    if (res != null)
+                    if (res != null) {
                         return res;
+                    }
                 }
+            }
         }
         return null;
     }
@@ -83,22 +92,25 @@ public class TreeWalker {
     /* when no parameters are set, while checking executable,
      * no real execution of the application is required */
     public static boolean execIsValid(File exec, String[] parameters, String test_signature) {
-        if (parameters == null || test_signature == null)
+        if (parameters == null || test_signature == null) {
             return exec.isFile();
+        }
 
         Process proc = null;
-        boolean valid = false;
-        
+        boolean valid = false, found_ers = false, found_ins = false;
+
         String[] cmd = new String[parameters.length + 1];
         cmd[0] = exec.getAbsolutePath();
-        if (parameters.length > 0)
+        if (parameters.length > 0) {
             System.arraycopy(parameters, 0, cmd, 1, parameters.length);
+        }
 
         try {
             StringBuilder buf = new StringBuilder();
             buf.append("Testing: ");
-            for (int i = 0; i < cmd.length; i++)
+            for (int i = 0; i < cmd.length; i++) {
                 buf.append(cmd[i]).append(' ');
+            }
             DEBUG.debug(buf.toString());
             proc = Runtime.getRuntime().exec(cmd);
             InputStream inp = proc.getInputStream();
@@ -109,10 +121,12 @@ public class TreeWalker {
             ins.start();
             ers.start();
             proc.waitFor();
-            boolean found_ins = (!Share.isEmpty(test_signature)) && 
-                                ins.containsIgnoreCase(test_signature);
-            boolean found_ers = (!Share.isEmpty(test_signature)) && 
-                                ers.containsIgnoreCase(test_signature);
+            found_ins = (!Share.isEmpty(test_signature))
+                    && ins.containsIgnoreCase(test_signature);
+            if (!found_ins) {
+                found_ers = (!Share.isEmpty(test_signature))
+                        && ers.containsIgnoreCase(test_signature);
+            }//end if (!found_ins)
             valid = (found_ins || found_ers);
         } catch (Exception ex) {
         } finally {
@@ -120,7 +134,7 @@ public class TreeWalker {
                 proc.destroy();
             } catch (Exception e) {
             }
-        }            
+        }
         return valid;
     }
 }
